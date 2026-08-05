@@ -239,7 +239,6 @@ Python, pandas, scikit-learn, matplotlib/seaborn, `mofdb_client`.
 
 ## Notebooks
 
-- `01_mof_co2_prediction.ipynb` — clean, final pipeline (data collection → EDA →
+- `02_mof_co2_prediction.ipynb` — clean, final pipeline (data collection → EDA →
   modeling → evaluation → interpretation)
-- `00_exploration_and_debugging.ipynb` — the sampling bias investigation and other
-  failed/superseded approaches, preserved for transparency
+
