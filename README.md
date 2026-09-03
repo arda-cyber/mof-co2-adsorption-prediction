@@ -11,14 +11,13 @@ actually mean physically.
 
 MOFs (Metal-Organic Frameworks) sit at an interesting intersection of chemistry and
 physics: their structure is designed through molecular/coordination chemistry, but
-properties like gas adsorption are ultimately governed by statistical thermodynamics —
-the side of the field I'm more drawn to. CO2 capture using MOFs is a well-studied but
-still largely lab-scale application, and one of its real bottlenecks isn't just finding
+properties like gas adsorption are ultimately governed by statistical thermodynamics. 
+CO2 capture using MOFs is a well-studied but still largely lab-scale application, and one of its real bottlenecks isn't just finding
 the material with the highest theoretical capacity, but narrowing an enormous candidate
 space (100,000+ hypothetical structures, in databases like the one used here) down to
-something worth pursuing further. High-throughput computational screening — the idea
-this project is a small-scale exploration of — is one way that gap gets addressed in
-practice.
+something worth pursuing further. High-throughput computational screening is one way that gap gets addressed in
+practice and this project is a small-scale exploration of this idea.
+
 
 **What this project is:** a supervised regression model that predicts CO2 uptake at a
 fixed pressure from structural descriptors (pore size, void fraction, surface area,
@@ -29,7 +28,7 @@ I approach a problem than the final model metric does.
 
 **What this project is not:** a claim to explain the full mechanism of CO2 adsorption
 in MOFs. The model has no visibility into linker chemistry, functional groups, open
-metal sites, or topology — all of which are known to meaningfully affect adsorption
+metal sites, or topology, all of which are known to meaningfully affect adsorption
 and are deliberately out of scope here. It also doesn't address synthesizability or
 long-term material stability, which matter just as much as uptake for anything real
 to come out of a screening process like this. I see this project as a first, honest
@@ -41,7 +40,7 @@ step into that kind of thinking, not a finished answer.
 
 **Task type:** Supervised regression. The target (`co2_uptake`) is a continuous
 physical quantity, not a category, so this is a regression problem by definition
-rather than a modeling choice.
+rather than a modeling choice. (reticular chemistry)
 
 **Target:** CO2 uptake (mol/kg) at 0.5 bar and 298 K.
 
@@ -118,7 +117,7 @@ from 0.41 to 0.55 across reruns and configurations), so **5-fold cross-validatio
 was used going forward as the primary evaluation method. Across several
 `max_depth`/`min_samples_leaf` configurations, mean CV R² converged to **0.49–0.53**,
 with differences between configurations falling within one standard deviation of each
-other — i.e., not statistically meaningful.
+other i.e., not statistically meaningful.
 
 **Was the ceiling about data quantity?** A learning curve (5-fold CV across training
 set sizes from 130 to ~1,300 samples) showed validation R² rising from 0.38 to ~0.52,
@@ -157,7 +156,7 @@ contributes under 5% combined, confirming the EDA signal. The engineered
 Interestingly, `pld` outweighs `lcd` by roughly 1.6x, which is chemically sensible:
 PLD (the narrowest constriction in the pore network) determines whether gas can
 access the pore network at all, while LCD only describes the size of the largest
-cavity — accessibility plausibly matters more than raw cavity size at this pressure.
+cavity, so accessibility plausibly matters more than raw cavity size at this pressure.
 
 ### Performance across the isotherm (multi-output regression)
 
@@ -201,14 +200,14 @@ likely source of the model's remaining error.
 
 - **Feature scope:** no visibility into linker chemistry, functional groups
   (e.g., amine groups known to strongly enhance CO2 affinity), open metal sites, or
-  network topology — all established contributors to CO2 adsorption in the
+  network topology, all established contributors to CO2 adsorption in the
   literature.
 - **Hypothetical structures:** hMOF is a computationally generated database; none of
   these structures are guaranteed synthesizable. An attempt to test generalization on
-  CoRE MOF 2019 (real, experimentally derived structures) was not completed — the
+  CoRE MOF 2019 (real, experimentally derived structures) was not completed and the
   measured isotherms in that database don't share hMOF's fixed 5-point pressure grid,
   and a direct-match extraction returned no data at 0.5 bar. This remains open for
-  future work (see below).
+  future work.
 - **Metal diversity:** limited to the 4 metals present in hMOF (Zn, Cu, V, Zr) —
   far narrower than the real MOF chemical space.
 - **Single pressure focus (primary model):** the main model targets 0.5 bar
