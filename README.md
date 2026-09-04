@@ -38,9 +38,7 @@ step into that kind of thinking, not a finished answer.
 
 ## Problem framing
 
-**Task type:** Supervised regression. The target (`co2_uptake`) is a continuous
-physical quantity, not a category, so this is a regression problem by definition
-rather than a modeling choice. (reticular chemistry)
+**Task type:** Supervised regression. The target (co2_uptake) is a continuous number (mol/kg), not a category, so regression is the natural choice here. This fits how reticular chemistry works too: isoreticular expansion keeps the underlying topology fixed while linker length or SBU size is varied, and pore-scale properties like surface area and void fraction shift continuously as a result, not in discrete jumps. That's the continuous output the model is learning to predict.
 
 **Target:** CO2 uptake (mol/kg) at 0.5 bar and 298 K.
 
@@ -119,15 +117,9 @@ was used going forward as the primary evaluation method. Across several
 with differences between configurations falling within one standard deviation of each
 other i.e., not statistically meaningful.
 
-**Was the ceiling about data quantity?** A learning curve (5-fold CV across training
-set sizes from 130 to ~1,300 samples) showed validation R² rising from 0.38 to ~0.52,
-but flattening substantially over the last third of the curve — more data brings
-diminishing returns rather than a path to a much higher score.
+**Was the ceiling about data quantity?** A learning curve (5-fold CV across training set sizes from 130 to ~1,300 samples) showed validation R² rising from 0.38 to ~0.52, though the curve flattened substantially over the last third, indicating that more data brings diminishing returns rather than a path to a much higher score.
 
-**Was the ceiling about feature selection?** A systematic comparison of 6 feature-set
-variants (dropping `pore_constriction`, dropping metal dummies, dropping `lcd` or
-`pld` individually, geometry-only) showed all variants within the same 0.515–0.530
-band — no combination of the *existing* features meaningfully changes the outcome.
+**Was the ceiling about feature selection?** A systematic comparison of 6 feature-set variants (dropping pore_constriction, dropping metal dummies, dropping lcd or pld individually, geometry-only) showed all variants within the same 0.515–0.530 band, confirming that no combination of the existing features meaningfully changes the outcome.
 
 **Conclusion:** the ~0.52 R² ceiling reflects the information content of the feature
 set itself (geometry + coarse metal identity), not a fixable modeling or data-volume
@@ -147,11 +139,7 @@ issue.
 | `metal_Zn` | 0.009 |
 | `metal_Zr` | 0.007 |
 
-Surface area and void fraction together account for ~73% of the model's predictive
-power. Metal identity — despite chemical intuition suggesting it should matter —
-contributes under 5% combined, confirming the EDA signal. The engineered
-`pore_constriction` feature (lcd − pld) added no measurable value over the raw
-`lcd`/`pld` pair.
+Surface area and void fraction together account for ~73% of the model's predictive power. Metal identity, despite chemical intuition suggesting it should matter, contributes under 5% combined, confirming the EDA signal. The engineered pore_constriction feature (lcd − pld) added no measurable value over the raw lcd/pld pair.
 
 Interestingly, `pld` outweighs `lcd` by roughly 1.6x, which is chemically sensible:
 PLD (the narrowest constriction in the pore network) determines whether gas can
@@ -172,27 +160,11 @@ trained to predict uptake at all 5 measured pressure points simultaneously
 | 0.5 | 0.426 |
 | 2.5 | 0.545 |
 
-Model R² increases monotonically with pressure. This is consistent with the physical
-picture that low-pressure adsorption is governed by adsorbate–surface interaction
-strength — sensitive to metal chemistry and functional groups not captured in this
-feature set — while high-pressure adsorption approaches saturation and is better
-explained by raw geometric capacity (pore volume, surface area), which is exactly
-what this model has access to. Predicting all 5 targets jointly did not improve
-0.5 bar performance over the single-target model, so the pressure-dependent trend
-appears to be a property of the feature set rather than something multi-output
-learning alone can fix.
+Model R² increases monotonically with pressure. This is consistent with the physical picture that low-pressure adsorption is governed by adsorbate–surface interaction strength, which is sensitive to metal chemistry and functional groups not captured in this feature set, while high-pressure adsorption approaches saturation and is better explained by raw geometric capacity (pore volume, surface area), which is exactly what this model has access to. Predicting all 5 targets jointly did not improve 0.5 bar performance over the single-target model, so the pressure-dependent trend appears to be a property of the feature set rather than something multi-output learning alone can fix.
 
 ### Where the model fails (residual analysis)
 
-The largest prediction errors are systematic **underpredictions** for geometrically
-strong MOFs (above-average surface area and void fraction) whose actual CO2 uptake
-exceeds what their geometry alone would predict. This effect is most pronounced for
-V- and Zn-based structures (mean absolute error ≈ 0.80 and 0.76 mol/kg respectively)
-and weakest for Zr (≈ 0.50 mol/kg) — consistent with Zr's known coordination
-stability in MOF chemistry (e.g., the UiO-66 family) versus the more variable
-oxidation-state chemistry of vanadium. This points to metal-specific
-electronic/coordination effects, not captured by geometric descriptors alone, as a
-likely source of the model's remaining error.
+The largest prediction errors are systematic underpredictions for geometrically strong MOFs (above-average surface area and void fraction) whose actual CO2 uptake exceeds what their geometry alone would predict. This effect is most pronounced for V- and Zn-based structures (mean absolute error ≈ 0.80 and 0.76 mol/kg respectively) and weakest for Zr (≈ 0.50 mol/kg), consistent with Zr's known coordination stability in MOF chemistry (e.g., the UiO-66 family) versus the more variable oxidation-state chemistry of vanadium. This points to metal-specific electronic/coordination effects, not captured by geometric descriptors alone, as a likely source of the model's remaining error.
 
 ---
 
